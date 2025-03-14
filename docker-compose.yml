@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: getpix_pix
+    restart: unless-stopped
+    environment:
+      - APP_ENV=local
+      - DB_CONNECTION=mongo
+      - DB_HOST=mongo
+      - DB_PORT=27017
+      - KAFKA_BROKER=getpix_kafka:9092
+    ports:
+      - "9502:9501"
+    volumes:
+      - ./html:/var/www/html
+    working_dir: /var/www/html
+    networks:
+      - docker_dbserver_default
+
+networks:
+  docker_dbserver_default:
+    external: true
