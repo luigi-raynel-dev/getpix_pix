@@ -14,7 +14,7 @@ services:
       - DB_PORT=27017
       - KAFKA_BROKER=getpix_kafka:9092
     ports:
-      - "9502:9501"
+      - "9503:9501"
     volumes:
       - ./html:/var/www/html
     working_dir: /var/www/html

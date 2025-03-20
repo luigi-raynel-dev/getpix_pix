@@ -38,6 +38,6 @@ message PixKeyListRequest {
   string userId = 1;
 }
 
-message PixKeyListRespondse {
+message PixKeyListResponse {
   repeated PixKey pix_keys = 1;
 }
