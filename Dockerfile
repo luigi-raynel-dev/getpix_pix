@@ -26,17 +26,6 @@ RUN pecl install protobuf && docker-php-ext-enable protobuf
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-RUN git clone --recursive -b v1.27.x https://github.com/grpc/grpc \
-  && cd grpc \
-  && cd third_party/protobuf \
-  && ./autogen.sh \
-  && ./configure CC=clang CXX=clang++ \
-  && make \
-  && make install \
-  && cd ../.. \
-  && make \
-  && make grpc_php_plugin
-
 WORKDIR /var/www/html
 
 COPY html /var/www/html
