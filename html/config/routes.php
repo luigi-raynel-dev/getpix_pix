@@ -14,9 +14,14 @@ use Hyperf\HttpServer\Router\Router;
 
 Router::addRoute(['GET', 'POST', 'HEAD'], '/', 'App\Controller\IndexController@index');
 
-
 Router::addGroup('/api', function () {
     Router::get('/ping', function () {
         return 'pong';
+    });
+});
+
+Router::addServer('grpc', function () {
+    Router::addGroup('/grpc.pix', function () {
+        Router::post('/createPixKey', 'App\Controller\PixKeyController@createPixKey');
     });
 });
