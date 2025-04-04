@@ -30,12 +30,30 @@ class PixKeyRepository implements PixKeyRepositoryInterface
     return $response;
   }
 
-  public function store(PixKeyRequest $pixKey): PixKeyResponse
+  public function store(PixKeyRequest $pixKeyRequest): PixKeyResponse
   {
     $response = new PixKeyResponse();
-    $response->setMessage("Pix Key created successfully!");
-    $response->setStatus(201);
-    return $response;
+    try {
+      $pixKey = $pixKeyRequest->getPixKey();
+      $this->pixKeyCollection->insertOne([
+        'key' => $pixKey->getKey(),
+        'type' => $pixKey->getType(),
+        'bankISPB' => $pixKey->getBankISPB(),
+        'belongsTo' => $pixKey->getBelongsTo() ?? null,
+        'userId' => $pixKeyRequest->getUserId(),
+        'created_at' => new \MongoDB\BSON\UTCDateTime(),
+        'updated_at' => new \MongoDB\BSON\UTCDateTime(),
+      ]);
+
+      $response->setMessage("Pix Key created successfully!");
+      $response->setStatus(201);
+
+      return $response;
+    } catch (\Exception $e) {
+      $response->setMessage("Error creating Pix Key: " . $e->getMessage());
+      $response->setStatus(500);
+      return $response;
+    }
   }
 
   public function update(PixKeyRequest $pixKey): PixKeyResponse
