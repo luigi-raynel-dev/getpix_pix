@@ -23,5 +23,9 @@ Router::addGroup('/api', function () {
 Router::addServer('grpc', function () {
     Router::addGroup('/grpc.pix', function () {
         Router::post('/createPixKey', 'App\Controller\PixKeyController@createPixKey');
+        Router::post('/updatePixKey', 'App\Controller\PixKeyController@updatePixKey');
+        Router::post('/getPixKeys', 'App\Controller\PixKeyController@getPixKeys');
+        Router::post('/getPixKey', 'App\Controller\PixKeyController@getPixKey');
+        Router::post('/deletePixKey', 'App\Controller\PixKeyController@deletePixKey');
     });
 });

@@ -2,16 +2,40 @@
 
 namespace App\Controller;
 
-use Pix\{PixKey, PixKeyRequest, PixKeyResponse};
+use Pix\{PixKeyId, PixKeyRequest, PixKeyResponse, PixKeyListRequest, PixKeyListResponse};
+use App\Repository\PixKeyRepository;
 
 class PixKeyController
 {
+  private $repository;
+
+  public function __construct(PixKeyRepository $repository)
+  {
+    $this->repository = $repository;
+  }
+
   public function CreatePixKey(PixKeyRequest $pixKey): PixKeyResponse
   {
-    var_dump($pixKey->getUserId());
-    $response = new PixKeyResponse();
-    $response->setMessage("Pix Key stored successfully!");
-    $response->setStatus(201);
-    return $response;
+    return $this->repository->store($pixKey);
+  }
+
+  public function UpdatePixKey(PixKeyRequest $pixKey): PixKeyResponse
+  {
+    return $this->repository->update($pixKey);
+  }
+
+  public function GetPixKeys(PixKeyListRequest $request): PixKeyListResponse
+  {
+    return $this->repository->index($request);
+  }
+
+  public function GetPixKey(PixKeyId $pixKey): PixKeyResponse
+  {
+    return $this->repository->show($pixKey);
+  }
+
+  public function DeletePixKey(PixKeyId $pixKey): PixKeyResponse
+  {
+    return $this->repository->delete($pixKey);
   }
 }
