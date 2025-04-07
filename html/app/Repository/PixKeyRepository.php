@@ -41,8 +41,8 @@ class PixKeyRepository implements PixKeyRepositoryInterface
         'bankISPB' => $pixKey->getBankISPB(),
         'belongsTo' => $pixKey->getBelongsTo() ?? null,
         'userId' => $pixKeyRequest->getUserId(),
-        'created_at' => new \MongoDB\BSON\UTCDateTime(),
-        'updated_at' => new \MongoDB\BSON\UTCDateTime(),
+        'createdAt' => new \MongoDB\BSON\UTCDateTime(),
+        'updatedAt' => new \MongoDB\BSON\UTCDateTime(),
       ]);
 
       $response->setMessage("Pix Key created successfully!");
@@ -56,19 +56,57 @@ class PixKeyRepository implements PixKeyRepositoryInterface
     }
   }
 
-  public function update(PixKeyRequest $pixKey): PixKeyResponse
+  public function update(PixKeyRequest $pixKeyRequest): PixKeyResponse
   {
     $response = new PixKeyResponse();
-    $response->setMessage("Pix Key updated successfully!");
-    $response->setStatus(200);
-    return $response;
+    try {
+      $pixKey = $pixKeyRequest->getPixKey();
+      $this->pixKeyCollection->updateOne(
+        [
+          '_id' => new \MongoDB\BSON\ObjectId($pixKeyRequest->getId()),
+          'userId' => $pixKeyRequest->getUserId()
+        ],
+        [
+          '$set' => [
+            'key' => $pixKey->getKey(),
+            'type' => $pixKey->getType(),
+            'bankISPB' => $pixKey->getBankISPB(),
+            'belongsTo' => $pixKey->getBelongsTo() ?? null,
+            'updatedAt' => new \MongoDB\BSON\UTCDateTime()
+          ]
+        ]
+      );
+
+      $response->setMessage("Pix Key updated successfully!");
+      $response->setStatus(200);
+
+      return $response;
+    } catch (\Exception $e) {
+      $response->setMessage("Error updating Pix Key: " . $e->getMessage());
+      $response->setStatus(500);
+      return $response;
+    }
   }
 
-  public function delete(PixKeyId $pixKey): PixKeyResponse
+  public function delete(PixKeyId $pixKeyRequest): PixKeyResponse
   {
     $response = new PixKeyResponse();
-    $response->setMessage("Pix Key deleted successfully!");
-    $response->setStatus(200);
-    return $response;
+    try {
+      $this->pixKeyCollection->deleteOne(
+        [
+          '_id' => new \MongoDB\BSON\ObjectId($pixKeyRequest->getId()),
+          'userId' => $pixKeyRequest->getUserId()
+        ]
+      );
+
+      $response->setMessage("Pix Key deleted successfully!");
+      $response->setStatus(200);
+
+      return $response;
+    } catch (\Exception $e) {
+      $response->setMessage("Error deleting Pix Key: " . $e->getMessage());
+      $response->setStatus(500);
+      return $response;
+    }
   }
 }
