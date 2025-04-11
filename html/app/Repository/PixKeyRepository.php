@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Model\PixKey;
-use Pix\{PixKeyRequest, PixKeyId, PixKeyListRequest, PixKeyResponse, PixKeyListResponse, PixKeyModel};
+use Pix\{PixKeyRequest, PixKeyId, PixKeyListRequest, PixKeyResponse, PixKeyListResponse, PixKeyShowResponse};
 
 class PixKeyRepository implements PixKeyRepositoryInterface
 {
@@ -15,11 +15,22 @@ class PixKeyRepository implements PixKeyRepositoryInterface
     $this->pixKeyCollection = (new PixKey)->collection;
   }
 
-  public function show(PixKeyId $pixKey): PixKeyResponse
+  public function show(PixKeyId $pixKeyRequest): PixKeyShowResponse
   {
-    $response = new PixKeyResponse();
-    $response->setMessage($pixKey->getId());
-    $response->setStatus(200);
+    try {
+      $id = new \MongoDB\BSON\ObjectId($pixKeyRequest->getId());
+    } catch (\MongoDB\Driver\Exception\InvalidArgumentException) {
+      $id = null;
+    }
+
+    $pixKey = $id ? $this->pixKeyCollection->findOne([
+      '_id' => $id,
+      'userId' => $pixKeyRequest->getUserId()
+    ]) : null;
+
+    $response = new PixKeyShowResponse();
+    $response->setPixKey($pixKey ? json_encode($pixKey->getArrayCopy()) : "");
+
     return $response;
   }
 

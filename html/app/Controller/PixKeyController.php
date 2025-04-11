@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use Pix\{PixKeyId, PixKeyRequest, PixKeyResponse, PixKeyListRequest, PixKeyListResponse};
+use Pix\{PixKeyId, PixKeyRequest, PixKeyResponse, PixKeyListRequest, PixKeyListResponse, PixKeyShowResponse};
 use App\Repository\PixKeyRepository;
 
 class PixKeyController
@@ -29,7 +29,7 @@ class PixKeyController
     return $this->repository->index($request);
   }
 
-  public function GetPixKey(PixKeyId $pixKey): PixKeyResponse
+  public function GetPixKey(PixKeyId $pixKey): PixKeyShowResponse
   {
     return $this->repository->show($pixKey);
   }
