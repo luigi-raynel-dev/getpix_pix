@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Model\PixKey;
-use Pix\{PixKeyRequest, PixKeyId, PixKeyListRequest, PixKeyResponse, PixKeyListResponse};
+use Pix\{PixKeyRequest, PixKeyId, PixKeyListRequest, PixKeyResponse, PixKeyListResponse, PixKeyModel};
 
 class PixKeyRepository implements PixKeyRepositoryInterface
 {
@@ -23,10 +23,15 @@ class PixKeyRepository implements PixKeyRepositoryInterface
     return $response;
   }
 
-  public function index(PixKeyListRequest $pixKey): PixKeyListResponse
+  public function index(PixKeyListRequest $pixKeyRequest): PixKeyListResponse
   {
+    $userId = $pixKeyRequest->getUserId();
+    $pixKeyList = $this->pixKeyCollection->find(['userId' => $userId]);
+
+    $pixKeys = json_encode(iterator_to_array($pixKeyList));
+
     $response = new PixKeyListResponse();
-    $response->setPixKeys([]);
+    $response->setPixKeys($pixKeys);
     return $response;
   }
 
