@@ -4,15 +4,16 @@ namespace App\Repository;
 
 use App\Model\PixKey;
 use Pix\{PixKeyRequest, PixKeyId, PixKeyListRequest, PixKeyResponse, PixKeyListResponse, PixKeyShowResponse};
+use MongoDB\Collection;
 
 class PixKeyRepository implements PixKeyRepositoryInterface
 {
   public int $http_status = 200;
   protected $pixKeyCollection;
 
-  public function __construct()
+  public function __construct(?Collection $collection = null)
   {
-    $this->pixKeyCollection = (new PixKey)->collection;
+    $this->pixKeyCollection = $collection ?? (new PixKey)->collection;
   }
 
   public function show(PixKeyId $pixKeyRequest): PixKeyShowResponse
