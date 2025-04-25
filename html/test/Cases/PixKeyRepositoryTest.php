@@ -137,9 +137,37 @@ class PixKeyRepositoryTest extends TestCase
         $repository = new PixKeyRepository($collectionMock);
         $response = $repository->update($request);
 
-        var_dump($response->getMessage());
-
         $this->assertEquals(200, $response->getStatus());
         $this->assertEquals('Pix Key updated successfully!', $response->getMessage());
+    }
+
+    public function testDeletePixKeySuccessfully()
+    {
+        $mockId = '64d3ca13a5e4f827ecb16b0a';
+
+        $request = new \Pix\PixKeyId();
+        $request->setId($mockId);
+        $request->setUserId('user-001');
+
+        $collectionMock = $this->createMock(\MongoDB\Collection::class);
+        $collectionMock->expects($this->once())
+            ->method('deleteOne')
+            ->with([
+                '_id' => new \MongoDB\BSON\ObjectId($mockId),
+                'userId' => 'user-001',
+            ]);
+
+        $repository = new class($collectionMock) extends \App\Repository\PixKeyRepository {
+            public function __construct($collection)
+            {
+                $this->pixKeyCollection = $collection;
+            }
+        };
+
+        $response = $repository->delete($request);
+
+        $this->assertInstanceOf(\Pix\PixKeyResponse::class, $response);
+        $this->assertEquals(200, $response->getStatus());
+        $this->assertEquals('Pix Key deleted successfully!', $response->getMessage());
     }
 }
