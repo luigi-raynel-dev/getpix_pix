@@ -20,6 +20,38 @@ use MongoDB\Collection;
 
 class PixKeyRepositoryTest extends TestCase
 {
+    public function testIndexReturnsListOfPixKeys()
+    {
+        $request = new \Pix\PixKeyListRequest();
+        $request->setUserId('user-001');
+
+        $mockData = [
+            ['key' => 'chave1', 'userId' => 'user-001'],
+            ['key' => 'chave2', 'userId' => 'user-001'],
+        ];
+
+        $mockCursor = new \ArrayIterator($mockData);
+
+        $collectionMock = $this->createMock(\MongoDB\Collection::class);
+        $collectionMock->expects($this->once())
+            ->method('find')
+            ->with(['userId' => 'user-001'])
+            ->willReturn($mockCursor);
+
+        $repository = new class($collectionMock) extends \App\Repository\PixKeyRepository {
+            public function __construct($collection)
+            {
+                $this->pixKeyCollection = $collection;
+            }
+        };
+
+        $response = $repository->index($request);
+
+        $this->assertInstanceOf(\Pix\PixKeyListResponse::class, $response);
+        $this->assertStringContainsString('"key":"chave1"', $response->getPixKeys());
+        $this->assertStringContainsString('"key":"chave2"', $response->getPixKeys());
+    }
+
     public function testStorePixKeyAndReturnsSuccessResponse()
     {
         // Criar objetos reais
