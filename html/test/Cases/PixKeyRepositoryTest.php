@@ -32,7 +32,6 @@ class PixKeyRepositoryTest extends TestCase
         $request->setPixKey($pixKey);
         $request->setUserId('user-001');
 
-        // Mock seguro da Collection
         $collectionMock = $this->createMock(Collection::class);
         $collectionMock->expects($this->once())
             ->method('insertOne')
@@ -40,11 +39,39 @@ class PixKeyRepositoryTest extends TestCase
                 return $data['key'] === '12345678900';
             }));
 
-        // Injeta no repositório e testa
         $repository = new PixKeyRepository($collectionMock);
         $response = $repository->store($request);
 
         $this->assertEquals(201, $response->getStatus());
         $this->assertEquals('Pix Key created successfully!', $response->getMessage());
+    }
+
+    public function testUpdatePixKeyAndReturnsSuccessResponse()
+    {
+        // Criar objetos reais
+        $pixKey = new PixKey();
+        $pixKey->setKey('12345678900');
+        $pixKey->setType('cpf');
+        $pixKey->setBankISPB('00000000');
+
+        $request = new PixKeyRequest();
+        $request->setPixKey($pixKey);
+        $request->setUserId('user-001');
+        $request->setId('64d3ca13a5e4f827ecb16b0a');
+
+        $collectionMock = $this->createMock(Collection::class);
+        $collectionMock->expects($this->once())
+            ->method('updateOne')
+            ->with($this->callback(function ($data) {
+                return (string) $data['_id'] === '64d3ca13a5e4f827ecb16b0a';
+            }));
+
+        $repository = new PixKeyRepository($collectionMock);
+        $response = $repository->update($request);
+
+        var_dump($response->getMessage());
+
+        $this->assertEquals(200, $response->getStatus());
+        $this->assertEquals('Pix Key updated successfully!', $response->getMessage());
     }
 }
