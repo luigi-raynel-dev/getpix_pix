@@ -52,6 +52,42 @@ class PixKeyRepositoryTest extends TestCase
         $this->assertStringContainsString('"key":"chave2"', $response->getPixKeys());
     }
 
+    public function testShowReturnsPixKeySuccessfully()
+    {
+        $mockId = '64d3ca13a5e4f827ecb16b0a';
+
+        $request = new \Pix\PixKeyId();
+        $request->setId($mockId);
+        $request->setUserId('user-001');
+
+        $expectedResult = new \ArrayObject([
+            '_id' => new \MongoDB\BSON\ObjectId($mockId),
+            'key' => 'minha-chave',
+            'userId' => 'user-001',
+        ]);
+
+        $collectionMock = $this->createMock(\MongoDB\Collection::class);
+        $collectionMock->expects($this->once())
+            ->method('findOne')
+            ->with([
+                '_id' => new \MongoDB\BSON\ObjectId($mockId),
+                'userId' => 'user-001',
+            ])
+            ->willReturn($expectedResult);
+
+        $repository = new class($collectionMock) extends \App\Repository\PixKeyRepository {
+            public function __construct($collection)
+            {
+                $this->pixKeyCollection = $collection;
+            }
+        };
+
+        $response = $repository->show($request);
+
+        $this->assertInstanceOf(\Pix\PixKeyShowResponse::class, $response);
+        $this->assertStringContainsString('"key":"minha-chave"', $response->getPixKey());
+    }
+
     public function testStorePixKeyAndReturnsSuccessResponse()
     {
         // Criar objetos reais
