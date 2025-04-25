@@ -38,7 +38,7 @@ class PixKeyRepositoryTest extends TestCase
             ->with(['userId' => 'user-001'])
             ->willReturn($mockCursor);
 
-        $repository = new class($collectionMock) extends \App\Repository\PixKeyRepository {
+        $repository = new class($collectionMock) extends PixKeyRepository {
             public function __construct($collection)
             {
                 $this->pixKeyCollection = $collection;
@@ -75,7 +75,7 @@ class PixKeyRepositoryTest extends TestCase
             ])
             ->willReturn($expectedResult);
 
-        $repository = new class($collectionMock) extends \App\Repository\PixKeyRepository {
+        $repository = new class($collectionMock) extends PixKeyRepository {
             public function __construct($collection)
             {
                 $this->pixKeyCollection = $collection;
@@ -107,7 +107,13 @@ class PixKeyRepositoryTest extends TestCase
                 return $data['key'] === '12345678900';
             }));
 
-        $repository = new PixKeyRepository($collectionMock);
+        $repository = new class($collectionMock) extends PixKeyRepository {
+            public function __construct($collection)
+            {
+                $this->pixKeyCollection = $collection;
+            }
+        };
+
         $response = $repository->store($request);
 
         $this->assertEquals(201, $response->getStatus());
@@ -134,7 +140,13 @@ class PixKeyRepositoryTest extends TestCase
                 return (string) $data['_id'] === '64d3ca13a5e4f827ecb16b0a';
             }));
 
-        $repository = new PixKeyRepository($collectionMock);
+        $repository = new class($collectionMock) extends PixKeyRepository {
+            public function __construct($collection)
+            {
+                $this->pixKeyCollection = $collection;
+            }
+        };
+
         $response = $repository->update($request);
 
         $this->assertEquals(200, $response->getStatus());
@@ -157,7 +169,7 @@ class PixKeyRepositoryTest extends TestCase
                 'userId' => 'user-001',
             ]);
 
-        $repository = new class($collectionMock) extends \App\Repository\PixKeyRepository {
+        $repository = new class($collectionMock) extends PixKeyRepository {
             public function __construct($collection)
             {
                 $this->pixKeyCollection = $collection;
